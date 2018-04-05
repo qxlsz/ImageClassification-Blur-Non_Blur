@@ -7,6 +7,7 @@ import scipy.misc as ms
 import scipy.ndimage as nd
 import argparse
 import cv2
+from imutils import paths
 def resize(X, orig_reso, w=100, h=100):
     r,c = w,h
     X_new = np.zeros((X.shape[0],r*c))
@@ -37,37 +38,43 @@ def validate(theta1, theta2, X, act = 'sig'):
     aa2 = h(theta2,aa1.T,'softmax')
     accu_matrix = np.argmax(aa2,axis=0) 
     return accu_matrix
-## Extracting the Info from Training Set Results from tmp dir
-inp_image = ms.imread('/Users/rjosyula/Pictures/ImageClassification3/Images/Bad/raw_Image_279.bmp', mode ="L")
-print(inp_image.shape)
-## Rescalling the Inputs
-#inp_image = inp_image.flatten()
-inp_image = nd.median_filter(inp_image,3)
-print(inp_image.shape)
-orig_reso = (964,1280)
-#inp_image = resize(inp_image, orig_reso)
-inp_image = ms.imresize(inp_image.reshape(orig_reso[0],orig_reso[1]),(100,100),interp='cubic').flatten()
-inp_image = inp_image/255.0
-print(inp_image.shape)
 
-inp_image = np.insert(inp_image, 0, 1, axis=0)
-print(inp_image.shape)
-## Orignal Resolution Of Image
+for imagepath in paths.list_images('/Users/rjosyula/Pictures/ImageClassification3/Images/Bad/'):
+    ## Extracting the Info from Training Set Results from tmp dir
+    inp_image = ms.imread(imagepath, mode ="L")
+    #print(inp_image.shape)
+    ## Rescalling the Inputs
+    #inp_image = inp_image.flatten()
+    inp_image = nd.median_filter(inp_image,3)
+    #print(inp_image.shape)
+    orig_reso = (964,1280)
+    #inp_image = resize(inp_image, orig_reso)
+    inp_image = ms.imresize(inp_image.reshape(orig_reso[0],orig_reso[1]),(100,100),interp='cubic').flatten()
+    inp_image = inp_image/255.0
+    #print(inp_image.shape)
 
-## construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
-ap.add_argument("-model_dir", "--model_dir", required=False, help="path to model directory")
-args = vars(ap.parse_args())
-## Retrieving the Temp Folder for Result 
-if args["model_dir"]:
-  filename = args["model_dir"]+str("/")
-else:
-  filename = "/tmp/blur_clear/"
-if not os.path.exists(os.path.dirname(filename)):
-    print "No dir exists" + filename
-    exit()
-## Extracting the Info from Training Set Results from tmp dir
-params = np.load(filename + str("/result.npy"))
-## Predicting the Labels , Accuracy Score
-pred_y = validate(params[()]['Theta1'], params[()]['Theta2'], inp_image)
-print (pred_y)
+    inp_image = np.insert(inp_image, 0, 1, axis=0)
+    #print(inp_image.shape)
+    ## Orignal Resolution Of Image
+
+    ## construct the argument parse and parse the arguments
+    ap = argparse.ArgumentParser()
+    ap.add_argument("-model_dir", "--model_dir", required=False, help="path to model directory")
+    args = vars(ap.parse_args())
+    ## Retrieving the Temp Folder for Result 
+    if args["model_dir"]:
+      filename = args["model_dir"]+str("/")
+    else:
+      filename = "/tmp/blur_clear/"
+    if not os.path.exists(os.path.dirname(filename)):
+        print "No dir exists" + filename
+        exit()
+    ## Extracting the Info from Training Set Results from tmp dir
+    params = np.load(filename + str("/result.npy"))
+    ## Predicting the Labels , Accuracy Score
+    pred_y = validate(params[()]['Theta1'], params[()]['Theta2'], inp_image)
+    if pred_y == 0:
+        print('Bad')
+    else:
+        print('Good')
+    

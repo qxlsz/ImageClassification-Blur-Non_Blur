@@ -276,7 +276,7 @@ X1 = np.insert(X1, 0, 1, axis=1) ## Adding the Biases
 
 ## Parameters for Model
 max_iter = 1000
-alpha = 0.0001
+alpha = 0.0005
 lambdaa = 0.0007
 nclass = np.unique(y).shape[0]
 act = 'sig'
