@@ -275,7 +275,7 @@ X1 = X1/255.0
 X1 = np.insert(X1, 0, 1, axis=1) ## Adding the Biases
 
 ## Parameters for Model
-max_iter = 1000
+max_iter = 5000
 alpha = 0.0005
 lambdaa = 0.0007
 nclass = np.unique(y).shape[0]
